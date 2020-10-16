@@ -55,10 +55,19 @@ app.get('/weather', (request, response) => {
     let data = require('./data/weather.json');
     let weatherArray = [];
     data.data.forEach(day => {
-      let weather = new Weather(day);
-      console.log(day.weather.description);
+      // turining valid_date onto a string
+      let everyDay = day.valid_date;
+      // split everyDay at '-'
+      let splitDay = everyDay.split('-');
+      // covert split day to dateString
+      let stringDay = new Date(splitDay).toDateString();
+      console.log(stringDay);
+      // each date is now a string in stringDay
+      let weather = new Weather(day, stringDay);
+      // console.log(day.weather.description);
       weatherArray.push(weather);
     });
+    console.log(weatherArray);
     response.send(weatherArray);
   }
   catch (error) {
@@ -89,9 +98,9 @@ function Location(obj, query) {
 //   this.image_url = obj.restaurant.thumb;
 // }
 
-function Weather(obj) {
+function Weather(obj, date) {
   this.forecast = obj.weather.description;
-  this.time = obj.datetime;
+  this.time = date;
 }
 
 // Start our server!

@@ -31,6 +31,8 @@ We will be utilizing Heroku, GitHub, Terminal, and VS Code.
 
 10-15-2020 10:45pm - The application can bring up error messages... I hope. The code was from collaborating with classmates and referencing the demo code. 
 
+10-16-2020 2:40pm - Converted the date format so that it reads the week of the day followed by the date.
+
 ## Feature Log
 
 ### Feature # 1: Location
