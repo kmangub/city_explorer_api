@@ -68,8 +68,9 @@ app.get('/weather', (request, response) => {
 });
 
 // app.get('/location', (request, response) => {
-//   let location = 
+//   let location =
 // })
+
 
 // Constructor to tailor our incoming raw data
 
@@ -80,13 +81,13 @@ function Location(obj, query) {
   this.formatted_query = obj.display_name;
 }
 
-function Restaurant(obj) {
-  this.url = obj.restaurant.url;
-  this.name = obj.restaurant.name;
-  this.rating = obj.restaurant.user_rating.aggregate_rating;
-  this.cost = obj.price_range;
-  this.image_url = obj.restaurant.thumb;
-}
+// function Restaurant(obj) {
+//   this.url = obj.restaurant.url;
+//   this.name = obj.restaurant.name;
+//   this.rating = obj.restaurant.user_rating.aggregate_rating;
+//   this.cost = obj.price_range;
+//   this.image_url = obj.restaurant.thumb;
+// }
 
 function Weather(obj) {
   this.forecast = obj.weather.description;
