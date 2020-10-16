@@ -22,35 +22,49 @@ app.get('/', (request, response) => {
 });
 
 app.get('/location', (request, response) => {
-  let city = request.query.city;
-  // getting the data from a database or API, using a flat file
-  let data = require('./data/location.json')[0];
-  let location = new Location(data, city);
-  console.log(location);
-  response.send(location);
+  try {
+
+    let city = request.query.city;
+    // getting the data from a database or API, using a flat file
+    let data = require('./data/location.json')[0];
+    let location = new Location(data, city);
+    console.log(location);
+    response.send(location);
+  }
+  catch (error) {
+    console.log('ERROR', error);
+    response.status(500).send('Yikes. Something went wrong.');
+  }
 });
 
-app.get('/restaurants', (request, response) => {
-  let data = require('./data/restaurants.json');
-  let restaurantArray = [];
-  data.nearby_restaurants.forEach(value => {
-    let restaurant = new Restaurant(value);
-    restaurantArray.push(restaurant);
-  });
-  console.log(restaurantArray);
-  response.send(restaurantArray);
+// app.get('/restaurants', (request, response) => {
+//   let data = require('./data/restaurants.json');
+//   let restaurantArray = [];
+//   data.nearby_restaurants.forEach(value => {
+//     let restaurant = new Restaurant(value);
+//     restaurantArray.push(restaurant);
+//   });
+//   console.log(restaurantArray);
+//   response.send(restaurantArray);
 
-});
+// });
 
 app.get('/weather', (request, response) => {
-  let data = require('./data/weather.json');
-  let weatherArray = [];
-  data.data.forEach(day => {
-    let weather = new Weather(day);
-    console.log(day.weather.description);
-    weatherArray.push(weather);
-  });
-  response.send(weatherArray);
+  try {
+
+    let data = require('./data/weather.json');
+    let weatherArray = [];
+    data.data.forEach(day => {
+      let weather = new Weather(day);
+      console.log(day.weather.description);
+      weatherArray.push(weather);
+    });
+    response.send(weatherArray);
+  }
+  catch (error) {
+    console.log('ERROR', error);
+    response.status(500).send('Yikes. Something went wrong.');
+  }
 });
 
 // app.get('/location', (request, response) => {
