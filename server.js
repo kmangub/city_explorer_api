@@ -26,6 +26,7 @@ app.get('/location', (request, response) => {
   // getting the data from a database or API, using a flat file
   let data = require('./data/location.json')[0];
   let location = new Location(data, city);
+  console.log(location);
   response.send(location);
 });
 
@@ -39,6 +40,17 @@ app.get('/restaurants', (request, response) => {
   console.log(restaurantArray);
   response.send(restaurantArray);
 
+});
+
+app.get('/weather', (request, response) => {
+  let data = require('./data/weather.json');
+  let weatherArray = [];
+  data.data.forEach(day => {
+    let weather = new Weather(day);
+    console.log(day.weather.description);
+    weatherArray.push(weather);
+  });
+  response.send(weatherArray);
 });
 
 // app.get('/location', (request, response) => {
@@ -60,6 +72,11 @@ function Restaurant(obj) {
   this.rating = obj.restaurant.user_rating.aggregate_rating;
   this.cost = obj.price_range;
   this.image_url = obj.restaurant.thumb;
+}
+
+function Weather(obj) {
+  this.forecast = obj.weather.description;
+  this.time = obj.datetime;
 }
 
 // Start our server!
