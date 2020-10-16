@@ -41,13 +41,17 @@ app.get('/restaurants', (request, response) => {
 
 });
 
+// app.get('/location', (request, response) => {
+//   let location = 
+// })
+
 // Constructor to tailor our incoming raw data
 
 function Location(obj, query) {
-  this.lat = obj.lat;
-  this.lon = obj.lon;
+  this.latitude = obj.lat;
+  this.longitude = obj.lon;
   this.search_query = query;
-  this.location = obj.display_name;
+  this.formatted_query = obj.display_name;
 }
 
 function Restaurant(obj) {
@@ -57,8 +61,6 @@ function Restaurant(obj) {
   this.cost = obj.price_range;
   this.image_url = obj.restaurant.thumb;
 }
-
-function 
 
 // Start our server!
 app.listen(PORT, () => {
