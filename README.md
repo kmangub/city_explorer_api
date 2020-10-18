@@ -53,6 +53,24 @@ Start time: 9:30pm
 Finish time: 10:45pm
 Actual time needed to complete: 1 hour 15 mins
 
+### Feature # 4: Location API
+Estimate of time needed to complete: 1 hour
+Start time: 2:30pm
+Finish time: 4:30pm
+Actual time needed to complete: 2 hours
+
+## Feature # 5: Weather API
+Estimate of time needed to complete: 1 hour
+Start time: 4:30pm
+Finish time: 6:30pm
+Actual time needed to complete: 2 hours
+
+## Feature # 6: Trail API
+Estimate of time needed to complete: 1 hour
+Start time: 6:30pm
+Finish time: 7:30pm
+Actual time needed to complete: 1 hours
+
 ## Credits and Collaborations
 
 <!-- Give credit (and a link) to other people or resources that helped you build this application. -->
@@ -62,3 +80,5 @@ Brandon Gonzales helped me figure out how to create a path to access the weather
 Grace Choi helped me get started with the weather code block.
 
 Referencing the demo code from the class-06 folder of the 301 repository.
+
+Anthony Beaver for helping me solve the request_query issue for the weather API

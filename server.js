@@ -5,6 +5,7 @@
 const express = require('express');
 const cors = require('cors');
 const superagent = require('superagent');
+
 require('dotenv').config();
 
 // Declare our port for our server to listen on
@@ -27,7 +28,7 @@ app.get('/location', (request, response) => {
 
   let city = request.query.city;
   let key = process.env.LOCATIONIQ_API_KEY;
-  console.log('city', city);
+  // console.log('city', city);
   const URL = `https://us1.locationiq.com/v1/search.php?key=${key}&q=${city}&format=json`;
 
   superagent.get(URL)
@@ -63,31 +64,60 @@ app.get('/location', (request, response) => {
 // });
 
 app.get('/weather', (request, response) => {
-  try {
+  let city = request.query.search_query;
+  let key = process.env.WEATHER_API_KEY;
+  const URL = `http://api.weatherbit.io/v2.0/forecast/daily/current?city=${city}&country=United%20States&key=${key}&days=7`;
+  // let data = require('./data/weather.json');
+  superagent.get(URL)
+    .then(data => {
+      let weatherArray = data.body.data.map(day => {
+        let stringDay = new Date(day.ts * 1000).toDateString();
 
-    let data = require('./data/weather.json');
-    let weatherArray = [];
-    data.data.forEach(day => {
-      // turining valid_date onto a string
-      let everyDay = day.valid_date;
-      // split everyDay at '-'
-      let splitDay = everyDay.split('-');
-      // covert split day to dateString
-      let stringDay = new Date(splitDay).toDateString();
-      // console.log(stringDay);
-      // each date is now a string in stringDay
-      let weather = new Weather(day, stringDay);
-      // console.log(day.weather.description);
-      weatherArray.push(weather);
+        let weather = new Weather(day, stringDay);
+        // console.log(day.weather.description);
+        return weather;
+      });
+      console.log(weatherArray);
+      response.status(200).json(weatherArray);
+      response.send(weatherArray);
+    })
+    .catch((error) => {
+      console.log('ERROR', error);
+      response.status(500).send('Yikes. Something went wrong.');
     });
-    // console.log(weatherArray);
-    response.send(weatherArray);
-  }
-  catch (error) {
-    console.log('ERROR', error);
-    response.status(500).send('Yikes. Something went wrong.');
-  }
 });
+
+app.get('/trails', trailHandler);
+
+function trailHandler(request, response) {
+
+  let lat = request.query.latitude;
+  let lon = request.query.longitude;
+  let key = process.env.TRAILS_API_KEY;
+
+  const URL = `https://www.hikingproject.com/data/get-trails?lat=${lat}&lon=${lon}&key=${key}&days=10`;
+
+  superagent.get(URL)
+    .then(data => {
+      let eachTrail = data.body.trails.map(trail => {
+        // console.log(trail);
+        let timeDateSplit = trail.conditionDate.split(' ');
+        // console.log(timeDateSplit);
+
+        return new Trails(trail, timeDateSplit);
+      });
+      response.status(200).json(eachTrail);
+      response.send(eachTrail);
+    })
+    .catch((error) => {
+      console.log('ERROR', error);
+      response.status(500).send('Yikes. Something went wrong.');
+    });
+}
+
+
+
+
 
 // app.get('/location', (request, response) => {
 //   let location =
@@ -114,6 +144,19 @@ function Location(obj, query) {
 function Weather(obj, date) {
   this.forecast = obj.weather.description;
   this.time = date;
+}
+
+function Trails(obj, dateTime) {
+  this.name = obj.name;
+  this.location = obj.location;
+  this.length = obj.length;
+  this.stars = obj.stars;
+  this.star_votes = obj.starVotes;
+  this.summary = obj.summary;
+  this.trail_url = obj.url;
+  this.conditions = obj.conditionStatus;
+  this.condition_date = new Date(dateTime[0]).toDateString();
+  this.condition_time = dateTime[1];
 }
 
 // Start our server!
