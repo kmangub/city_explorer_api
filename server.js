@@ -4,7 +4,7 @@
 // Bring in our dependencies
 const express = require('express');
 const cors = require('cors');
-
+const superagent = require('superagent');
 require('dotenv').config();
 
 // Declare our port for our server to listen on
@@ -16,25 +16,38 @@ const app = express();
 // Use CORS (cross origin resource sharing)
 app.use(cors());
 
+app.use(express.urlencoded());
+
 // Routes
 app.get('/', (request, response) => {
   response.send('Hello World');
 });
 
 app.get('/location', (request, response) => {
-  try {
 
-    let city = request.query.city;
-    // getting the data from a database or API, using a flat file
-    let data = require('./data/location.json')[0];
-    let location = new Location(data, city);
-    console.log(location);
-    response.send(location);
-  }
-  catch (error) {
-    console.log('ERROR', error);
-    response.status(500).send('Yikes. Something went wrong.');
-  }
+  let city = request.query.city;
+  let key = process.env.LOCATIONIQ_API_KEY;
+  console.log('city', city);
+  const URL = `https://us1.locationiq.com/v1/search.php?key=${key}&q=${city}&format=json`;
+
+  superagent.get(URL)
+    .then(data => {
+      let location = new Location(data.body[0], city);
+      console.log(location);
+      response.status(200).json(location);
+    })
+    .catch((error) => {
+      console.log('error', error);
+      response.status(500).send('API is not working?');
+    });
+
+
+
+  // getting the data from a database or API, using a flat file
+  // let data = require('./data/location.json')[0];
+  // console.log(location);
+  // response.send(location);
+
 });
 
 // app.get('/restaurants', (request, response) => {
@@ -61,13 +74,13 @@ app.get('/weather', (request, response) => {
       let splitDay = everyDay.split('-');
       // covert split day to dateString
       let stringDay = new Date(splitDay).toDateString();
-      console.log(stringDay);
+      // console.log(stringDay);
       // each date is now a string in stringDay
       let weather = new Weather(day, stringDay);
       // console.log(day.weather.description);
       weatherArray.push(weather);
     });
-    console.log(weatherArray);
+    // console.log(weatherArray);
     response.send(weatherArray);
   }
   catch (error) {
