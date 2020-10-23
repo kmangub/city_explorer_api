@@ -5,8 +5,10 @@
 const express = require('express');
 const cors = require('cors');
 const superagent = require('superagent');
-
+const pg = require('pg');
+const { request } = require('express');
 require('dotenv').config();
+
 
 // Declare our port for our server to listen on
 const PORT = process.env.PORT || 3000;
@@ -19,6 +21,10 @@ app.use(cors());
 
 app.use(express.urlencoded());
 
+// Create our postgres client
+const client = new pg.Client(process.env.DATABASE_URL);
+client.on('error', err => { throw err; });
+
 // Routes
 app.get('/', (request, response) => {
   response.send('Hello World');
@@ -28,28 +34,29 @@ app.get('/location', (request, response) => {
 
   let city = request.query.city;
   let key = process.env.LOCATIONIQ_API_KEY;
+
   // console.log('city', city);
   const URL = `https://us1.locationiq.com/v1/search.php?key=${key}&q=${city}&format=json`;
 
   superagent.get(URL)
     .then(data => {
       let location = new Location(data.body[0], city);
-      console.log(location);
+      // console.log(location);
       response.status(200).json(location);
     })
     .catch((error) => {
       console.log('error', error);
       response.status(500).send('API is not working?');
     });
-
-
-
-  // getting the data from a database or API, using a flat file
-  // let data = require('./data/location.json')[0];
-  // console.log(location);
-  // response.send(location);
-
 });
+
+
+
+// getting the data from a database or API, using a flat file
+// let data = require('./data/location.json')[0];
+// console.log(location);
+// response.send(location);
+
 
 // app.get('/restaurants', (request, response) => {
 //   let data = require('./data/restaurants.json');
@@ -115,7 +122,28 @@ function trailHandler(request, response) {
     });
 }
 
+// app.get('/add', (request, response) => {
+//   request.query
+// });
 
+// Copied from Class Demo 08
+app.get('/add', (request, response) => {
+  let SQL = 'SELECT * FROM location';
+  client.query(SQL)
+    .then(results => {
+      console.log(results.rows[0]);
+      response.status(200).json(results.rows);
+    })
+    .catch(error => {
+      console.log('ERROR', error);
+      response.status(500).send('So sorry, something went wrong.');
+    });
+});
+
+//create an array
+//create a loop to match the city name
+//if there's a match retrieve the lat lon from the matching city
+//otherwise, hit the API and store the new lat and lon to the database
 
 
 
@@ -160,6 +188,12 @@ function Trails(obj, dateTime) {
 }
 
 // Start our server!
-app.listen(PORT, () => {
-  console.log(`Server is now listening on port ${PORT}`);
-});
+client.connect()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Now listening on port ${PORT}`);
+    });
+  })
+  .catch(err => {
+    console.log('ERROR', err);
+  });
