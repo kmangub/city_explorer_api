@@ -35,14 +35,48 @@ app.get('/location', (request, response) => {
   let city = request.query.city;
   let key = process.env.LOCATIONIQ_API_KEY;
 
-  // console.log('city', city);
-  const URL = `https://us1.locationiq.com/v1/search.php?key=${key}&q=${city}&format=json`;
+  const SQL = `SELECT * FROM location WHERE search_query=$1`;
+  const safeValue = [city];
 
-  superagent.get(URL)
-    .then(data => {
-      let location = new Location(data.body[0], city);
-      // console.log(location);
-      response.status(200).json(location);
+  client.query(SQL, safeValue)
+    .then(results => {
+      console.log(results);
+      if (results.rows.length > 0) {
+        console.log('Database used');
+        response.status(200).json(results.rows[0]);
+      } else {
+        const URL = `https://us1.locationiq.com/v1/search.php?key=${key}&q=${city}&format=json`;
+
+        superagent.get(URL)
+          .then(data => {
+            let location = new Location(data.body[0], city);
+            //Sending these variables to the database
+            let cityQuery = location.search_query;
+            let cityFormatQuery = location.formatted_query;
+            let cityLat = location.latitude;
+            let cityLon = location.longitude;
+
+            //SQL statement to the database
+            const SQL = `INSERT INTO location (search_query, formatted_query, latitude, longitude) VALUES($1, $2, $3, $4) RETURNING *`;
+            const safeValue = [cityQuery, cityFormatQuery, cityLat, cityLon];
+
+            //send and receive from the database (sending)
+            client.query(SQL, safeValue)
+              .then(results => {
+                console.log('Added to the database', results.rows);
+              })
+              .catch(error => {
+                console.log('Sending to the database error', error);
+                response.status(500).send('Something went wrong.');
+              });
+            // console.log(location);
+            response.status(200).json(location);
+          })
+          .catch((error) => {
+            console.log('error', error);
+            response.status(500).send('API is not working?');
+          });
+      }
     })
     .catch((error) => {
       console.log('error', error);
