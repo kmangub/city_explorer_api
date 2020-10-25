@@ -18,7 +18,6 @@ const app = express();
 
 // Use CORS (cross origin resource sharing)
 app.use(cors());
-
 app.use(express.urlencoded());
 
 // Create our postgres client
@@ -40,7 +39,7 @@ app.get('/location', (request, response) => {
 
   client.query(SQL, safeValue)
     .then(results => {
-      console.log(results);
+      // console.log(results);
       if (results.rows.length > 0) {
         console.log('Database used');
         response.status(200).json(results.rows[0]);
@@ -118,7 +117,7 @@ app.get('/weather', (request, response) => {
         // console.log(day.weather.description);
         return weather;
       });
-      console.log(weatherArray);
+      // console.log(weatherArray);
       response.status(200).json(weatherArray);
       response.send(weatherArray);
     })
@@ -156,23 +155,69 @@ function trailHandler(request, response) {
     });
 }
 
-// app.get('/add', (request, response) => {
-//   request.query
-// });
+app.get('/movies', movieHandler);
+
+function movieHandler(request, response) {
+  let city = request.query.search_query;
+  let key = process.env.MOVIE_API_KEY;
+
+  const URL = `https://api.themoviedb.org/3/search/movie?api_key=${key}&language=en-US&query=${city}&page=1&include_adult=false`;
+
+  superagent.get(URL)
+    .then(data => {
+      console.log(data.body.results[0]);
+      let eachMovie = data.body.results.map(movie => {
+        return new Movies(movie);
+      });
+      response.status(200).json(eachMovie);
+      response.send(eachMovie);
+    })
+    .catch((error) => {
+      console.log('ERROR', error);
+      response.status(500).send('Yikes. Something went wrong with the movie API');
+    });
+}
+
+app.get('/yelp', yelpHandler);
+
+function yelpHandler(request, response) {
+  let city = request.query.search_query;
+  let key = process.env.YELP_API_KEY;
+  const page = request.query.page || 1;
+  let numPerPage = 5;
+  const offset = ((page - 1) * numPerPage);
+
+  const URL = `https://api.yelp.com/v3/businesses/search?location=${city}&term=restaurants&limit=5&offset=${offset}`;
+
+  superagent.get(URL)
+    .set('Authorization', `Bearer ${key}`)
+    .then(data => {
+      // console.log(data.body.businesses[0]);
+      let eachRestaurant = data.body.businesses.map(restaurant => {
+        return new Restaurants(restaurant);
+      });
+      response.status(200).json(eachRestaurant);
+      response.send(eachRestaurant);
+    })
+    .catch((error) => {
+      console.log('ERROR', error);
+      response.status(500).send('Something went wrong with the YELP API');
+    });
+}
 
 // Copied from Class Demo 08
-app.get('/add', (request, response) => {
-  let SQL = 'SELECT * FROM location';
-  client.query(SQL)
-    .then(results => {
-      console.log(results.rows[0]);
-      response.status(200).json(results.rows);
-    })
-    .catch(error => {
-      console.log('ERROR', error);
-      response.status(500).send('So sorry, something went wrong.');
-    });
-});
+// app.get('/add', (request, response) => {
+//   let SQL = 'SELECT * FROM location';
+//   client.query(SQL)
+//     .then(results => {
+//       console.log(results.rows[0]);
+//       response.status(200).json(results.rows);
+//     })
+//     .catch(error => {
+//       console.log('ERROR', error);
+//       response.status(500).send('So sorry, something went wrong.');
+//     });
+// });
 
 //create an array
 //create a loop to match the city name
@@ -219,6 +264,23 @@ function Trails(obj, dateTime) {
   this.conditions = obj.conditionStatus;
   this.condition_date = new Date(dateTime[0]).toDateString();
   this.condition_time = dateTime[1];
+}
+
+function Movies(obj) {
+  this.title = obj.title;
+  this.overview = obj.overview;
+  this.average_votes = obj.vote_average;
+  this.image_url = `https://image.tmdb.org/t/p/w500/${obj.poster_path}`;
+  this.popularity = obj.popularity;
+  this.released_on = obj.release_date;
+}
+
+function Restaurants(obj) {
+  this.name = obj.name;
+  this.image_url = obj.image_url;
+  this.price = obj.price;
+  this.rating = obj.rating;
+  this.url = obj.url;
 }
 
 // Start our server!
