@@ -71,6 +71,42 @@ Start time: 6:30pm
 Finish time: 7:30pm
 Actual time needed to complete: 1 hours
 
+## Feature # 7: Database
+Estimate of time needed to complete: 1 hour
+Start time: 6:30pm
+Finish time: 7:30pm
+Actual time needed to complete: 1 hours
+
+## Feature # 8: Server
+Estimate of time needed to complete: 1 hour
+Start time: 7:30pm
+Finish time: 9:30pm
+Actual time needed to complete: 2 hours
+
+## Feature # 9: Deploy
+Estimate of time needed to complete: 1 hour
+Start time: 2:00pm
+Finish time: 2:10pm
+Actual time needed to complete: 10 mins
+
+## Feature # 10: Movies
+Estimate of time needed to complete: 1 hour
+Start time: 3:00pm
+Finish time: 4:30pm
+Actual time needed to complete: 1.5 hours
+
+## Feature # 11: Yelp
+Estimate of time needed to complete: 1 hour
+Start time: 4:30pm
+Finish time: 5:15pm
+Actual time needed to complete: 1.25 hours
+
+## Feature # 12: Pagination
+Estimate of time needed to complete: 1 hour
+Start time: 5:15pm
+Finish time: 5:25pm
+Actual time needed to complete: 10 mins
+
 ## Credits and Collaborations
 
 <!-- Give credit (and a link) to other people or resources that helped you build this application. -->
@@ -82,3 +118,5 @@ Grace Choi helped me get started with the weather code block.
 Referencing the demo code from the class-06 folder of the 301 repository.
 
 Anthony Beaver for helping me solve the request_query issue for the weather API
+
+Brandon Gonzales aided with finding the URL for Yelp 
